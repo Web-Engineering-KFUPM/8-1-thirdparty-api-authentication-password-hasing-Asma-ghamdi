@@ -248,7 +248,7 @@ app.post("/register", async (req, res) => {
   // Implement logic here based on the TODO 1.
   try {
   const { email, password } = req.body || {};
-  if (email==="" || password === "") {
+  if (!email || !password) {
     return res.status(400).json({ error: "Email and password are required" });
   }
   const existing = users.find((u) => u.email === email);
@@ -263,8 +263,6 @@ app.post("/register", async (req, res) => {
   return res.status(500).json({ error: "Server error during register" });
 }
 });
-
-
 // =========================
 // POST /login
 // =========================
@@ -272,11 +270,11 @@ app.post("/login", async (req, res) => {
   // Implement logic here based on the TODO 2.
     try {
   const { email, password } = req.body || {};
-  if (email==="" || password === "") {
+  if (!email || !password) {
     return res.status(400).json({ error: "Email and password are required" });
   }
   const user = users.find((u) => u.email === email);
-  if (user==="") {
+  if (!user) {
   return res.status(400).json({ error: "User not found" });
   }
   const match = await bcrypt.compare(password, user.passwordHash);
