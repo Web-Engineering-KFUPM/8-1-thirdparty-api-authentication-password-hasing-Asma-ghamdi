@@ -252,13 +252,13 @@ app.post("/register", async (req, res) => {
     return res.status(400).json({ error: "Email and password are required" });
   }
   const existing = users.find((u) => u.email === email);
-  if (existing!="") {
+  if (existing) {
   return res.status(400).json({ error: "User already exists" });
   }
   const hash = await bcrypt.hash(password, 10);
   users.push({ email, passwordHash: hash });
   return res.status(201).json({ message: "User registered!" });
-} catch {
+} catch (err) {
   console.error("Register error:", err);
   return res.status(500).json({ error: "Server error during register" });
 }
@@ -287,7 +287,7 @@ app.post("/login", async (req, res) => {
     { expiresIn: "1h" }
   );
   return res.json({ token });
-} catch {
+} catch (err) {
     console.error("Login error:", err);
     return res.status(500).json({ error: "Server error during login" });
 }
@@ -307,7 +307,7 @@ app.get("/weather", async (req, res) => {
   const token = auth.split(" ")[1];
   try {
     jwt.verify(token, JWT_SECRET);
-  } catch {
+  } catch (err) {
     return res.status(401).json({ error: "Invalid token" });
   }
   const city = req.query.city;
