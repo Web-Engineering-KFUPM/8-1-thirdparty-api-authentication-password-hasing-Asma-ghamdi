@@ -259,15 +259,40 @@ app.post("/register", async (req, res) => {
   users.push({ email, passwordHash: hash });
   return res.status(201).json({ message: "User registered!" });
 } catch {
+  console.error("Register error:", err);
   return res.status(500).json({ error: "Server error during register" });
 }
 });
+
 
 // =========================
 // POST /login
 // =========================
 app.post("/login", async (req, res) => {
   // Implement logic here based on the TODO 2.
+    try {
+  const { email, password } = req.body || {};
+  if (email==="" || password === "") {
+    return res.status(400).json({ error: "Email and password are required" });
+  }
+  const user = users.find((u) => u.email === email);
+  if (user==="") {
+  return res.status(400).json({ error: "User not found" });
+  }
+  const match = await bcrypt.compare(password, user.passwordHash);
+  if (!match) {
+    return res.status(400).json({ error: "Wrong password" });
+  }
+  const token = jwt.sign(
+    { email },
+    JWT_SECRET,          // this is "abc123"
+    { expiresIn: "1h" }
+  );
+  return res.json({ token });
+} catch {
+    console.error("Login error:", err);
+    return res.status(500).json({ error: "Server error during login" });
+}
 });
 
 // =========================
